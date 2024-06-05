@@ -9,6 +9,6 @@ class Constants {
       'http://localhost:3000'; //api endpoints for later
 }
 
-class Constants {
-  static const String apiUrl = 'http://localhost:3000';
-}
+// class Constants {
+//   static const String apiUrl = 'http://localhost:3000';
+// }

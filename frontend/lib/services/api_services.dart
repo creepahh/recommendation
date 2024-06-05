@@ -2,22 +2,37 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String baseUrl =
-      'http://localhost:3000'; //need to use the path of csv file instead, will come later
+  final String baseUrl = 'https://api.themoviedb.org/3';
+  final String apiKey = ''; // have to get one,
 
-  Future<List<String>> getRecommendations(int userId) async {
-    final response =
-        await http.get(Uri.parse('$baseUrl/recommendations?user_id=$userId'));
+  Future<List<Movie>> getRecommendations(int userId) async {
+    final response = await http.get(Uri.parse(
+        '$baseUrl/discover/movie?api_key=$apiKey&sort_by=popularity.desc&include_adult=false&page=1&with_watch_monetization_types=flatrate'));
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      List<String> recommendations = [];
-      for (var item in data) {
-        recommendations.add(item['title']);
+      final Map<String, dynamic> data = json.decode(response.body);
+      final List<dynamic> results = data['results'];
+      List<Movie> recommendations = [];
+      for (var item in results) {
+        recommendations.add(Movie.fromJson(item));
       }
       return recommendations;
     } else {
       throw Exception('Failed to load recommendations');
     }
+  }
+}
+
+class Movie {
+  final String title;
+  final String posterUrl;
+
+  Movie({required this.title, required this.posterUrl});
+
+  factory Movie.fromJson(Map<String, dynamic> json) {
+    return Movie(
+      title: json['title'],
+      posterUrl: 'https://image.tmdb.org/t/p/w500${json['poster_path']}',
+    );
   }
 }
