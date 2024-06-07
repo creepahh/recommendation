@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   final String baseUrl = 'https://api.themoviedb.org/3';
-  final String apiKey = ''; // have to get one,
+  final String apiKey = 'a42747a7f8d7503408b39c8a714bd678'; // TMDB API key
 
   Future<List<Movie>> getRecommendations(int userId) async {
     final response = await http.get(Uri.parse(
@@ -24,6 +24,7 @@ class ApiService {
 }
 
 class Movie {
+  //factory method to create a Movie object from a JSON map
   final String title;
   final String posterUrl;
 

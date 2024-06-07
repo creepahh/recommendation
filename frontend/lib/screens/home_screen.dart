@@ -8,15 +8,20 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ApiService apiService = ApiService();
-  List<Movie> recommendations = [];
+  List<Movie> recommendations = []; //the list to hold movie recommendations
   final TextEditingController userIdController = TextEditingController();
 
   void fetchRecommendations() async {
-    final userId = int.parse(userIdController.text);
-    final recs = await apiService.getRecommendations(userId);
-    setState(() {
-      recommendations = recs.cast<Movie>();
-    });
+    try {
+      final userId = int.parse(userIdController.text);
+      final recs = await apiService.getRecommendations(userId);
+      setState(() {
+        recommendations = recs;
+      });
+    } catch (e) {
+      print(e);
+      // Handle error, maybe show a snackbar or dialog
+    }
   }
 
   @override
@@ -63,9 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     itemCount: recommendations.length,
                     itemBuilder: (context, index) {
-                      return MoviePoster(
-                        movie: recommendations[index],
-                      );
+                      return MoviePoster(movie: recommendations[index]);
                     },
                   ),
                 ),
@@ -108,9 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     itemCount: recommendations.length,
                     itemBuilder: (context, index) {
-                      return MoviePoster(
-                        movie: recommendations[index],
-                      );
+                      return MoviePoster(movie: recommendations[index]);
                     },
                   ),
           ),
@@ -123,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
 class MoviePoster extends StatelessWidget {
   final Movie movie;
 
-  const MoviePoster({Key? key, required this.movie}) : super(key: key);
+  const MoviePoster({super.key, required this.movie});
 
   @override
   Widget build(BuildContext context) {
@@ -148,20 +149,6 @@ class MoviePoster extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class Movie {
-  final String title;
-  final String posterUrl;
-
-  Movie({required this.title, required this.posterUrl});
-
-  factory Movie.fromJson(Map<String, dynamic> json) {
-    return Movie(
-      title: json['title'],
-      posterUrl: json['poster_url'],
     );
   }
 }
