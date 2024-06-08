@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -24,16 +25,66 @@ class ApiService {
 }
 
 class Movie {
-  //factory method to create a Movie object from a JSON map
   final String title;
   final String posterUrl;
+  bool isFavorite;
 
-  Movie({required this.title, required this.posterUrl});
+  Movie(
+      {required this.title, required this.posterUrl, this.isFavorite = false});
 
   factory Movie.fromJson(Map<String, dynamic> json) {
     return Movie(
       title: json['title'],
       posterUrl: 'https://image.tmdb.org/t/p/w500${json['poster_path']}',
+    );
+  }
+
+  void toggleFavorite() {}
+}
+
+class MoviePoster extends StatelessWidget {
+  final Movie movie;
+
+  const MoviePoster({super.key, required this.movie});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 5,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Image.network(
+              movie.posterUrl,
+              fit: BoxFit.cover,
+              width: double.infinity,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  movie.title,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: Icon(movie.isFavorite
+                      ? Icons.favorite
+                      : Icons.favorite_border),
+                  onPressed: () {
+                    // Toggle favorite state of the movie
+                    movie.isFavorite = !movie.isFavorite;
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
