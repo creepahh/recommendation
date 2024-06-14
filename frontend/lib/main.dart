@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import '../services/api_services.dart'; // Ensure you have the correct path
+import 'services/api_services.dart';
+import 'screens/home_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -19,9 +22,15 @@ class MyApp extends StatelessWidget {
         title: 'Movie Recommendation App',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: Color.fromARGB(255, 34, 248, 255)),
         ),
-        home: MyHomePage(),
+        home: LoginScreen(),
+        routes: {
+          LoginScreen.routeName: (ctx) => LoginScreen(),
+          RegisterScreen.routeName: (ctx) => RegisterScreen(),
+          HomeScreen.routeName: (ctx) => HomeScreen(),
+        },
         locale: Locale('en', 'US'),
         supportedLocales: const [
           Locale('en', 'US'),
@@ -46,128 +55,5 @@ class MyAppState extends ChangeNotifier {
       favorites.add(movie);
     }
     notifyListeners();
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return HomeScreen();
-  }
-}
-
-class HomeScreen extends StatefulWidget {
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  final ApiService apiService = ApiService();
-  List<Movie> recommendations = [];
-
-  @override
-  void initState() {
-    super.initState();
-    fetchRecommendations(1); // Fetch recommendations for user 1
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Movie Recommendations')),
-      body: _buildRecommendations(),
-    );
-  }
-
-  Widget _buildRecommendations() {
-    return ListView.builder(
-      itemCount: recommendations.length,
-      itemBuilder: (context, index) {
-        return MoviePoster(
-          movie: recommendations[index],
-          onFavoritePressed: () {
-            // Toggle favorite state of the movie
-            setState(() {
-              recommendations[index].toggleFavorite();
-            });
-            context.read<MyAppState>().toggleFavorite(recommendations[index]);
-          },
-        );
-      },
-    );
-  }
-
-  void fetchRecommendations(int userId) async {
-    try {
-      // Fetch recommendations from API
-      final recs = await apiService.getRecommendations(userId);
-
-      // Update recommendations
-      setState(() {
-        recommendations = recs.cast<Movie>();
-      });
-    } catch (e) {}
-  }
-}
-
-class MoviePoster extends StatelessWidget {
-  final Movie movie;
-  final VoidCallback? onFavoritePressed;
-
-  const MoviePoster({super.key, required this.movie, this.onFavoritePressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Image.network(
-              movie.posterUrl,
-              fit: BoxFit.cover,
-              width: double.infinity,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  movie.title,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  icon: Icon(
-                    movie.isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: movie.isFavorite ? Colors.red : null,
-                  ),
-                  onPressed: onFavoritePressed,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class Movie {
-  final String title;
-  final String posterUrl;
-  bool isFavorite;
-
-  Movie({
-    required this.title,
-    required this.posterUrl,
-    this.isFavorite = false,
-  });
-
-  void toggleFavorite() {
-    isFavorite = !isFavorite;
   }
 }

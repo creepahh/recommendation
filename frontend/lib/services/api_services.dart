@@ -39,13 +39,16 @@ class Movie {
     );
   }
 
-  void toggleFavorite() {}
+  void toggleFavorite() {
+    isFavorite = !isFavorite;
+  }
 }
 
 class MoviePoster extends StatelessWidget {
   final Movie movie;
+  final VoidCallback? onFavoritePressed;
 
-  const MoviePoster({super.key, required this.movie});
+  const MoviePoster({super.key, required this.movie, this.onFavoritePressed});
 
   @override
   Widget build(BuildContext context) {
@@ -54,12 +57,10 @@ class MoviePoster extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Image.network(
-              movie.posterUrl,
-              fit: BoxFit.cover,
-              width: double.infinity,
-            ),
+          Image.network(
+            movie.posterUrl,
+            fit: BoxFit.cover,
+            width: double.infinity,
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -72,13 +73,11 @@ class MoviePoster extends StatelessWidget {
                       fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 IconButton(
-                  icon: Icon(movie.isFavorite
-                      ? Icons.favorite
-                      : Icons.favorite_border),
-                  onPressed: () {
-                    // Toggle favorite state of the movie
-                    movie.isFavorite = !movie.isFavorite;
-                  },
+                  icon: Icon(
+                    movie.isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: movie.isFavorite ? Colors.red : null,
+                  ),
+                  onPressed: onFavoritePressed,
                 ),
               ],
             ),
